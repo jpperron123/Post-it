@@ -1,0 +1,419 @@
+/* ===== SwiftNotes — Floating Note Window ===== */
+/* Transparent window: only the shape is visible */
+/* Drag by clicking anywhere on the note body */
+
+@import url('./themes.css');
+
+:root {
+    --font-ui: 'Quicksand', sans-serif;
+    --font-handwritten: 'Caveat', cursive;
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    background: transparent;
+    overflow: hidden;
+    min-height: 100vh;
+    font-family: var(--font-ui);
+    user-select: none;
+}
+
+/* ===== NOTE WINDOW ===== */
+.note-window {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== GOLD PIN (clickable) ===== */
+.note-pin {
+    position: absolute;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #ffe88a, #d4a520);
+    z-index: 30;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    /* Unpinned: floating with shadow */
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.4),
+        0 0 6px rgba(240, 199, 94, 0.3);
+}
+
+/* Pinned state: pushed in, no shadow, glow */
+.note-pin.pinned {
+    box-shadow:
+        0 0 12px rgba(240, 199, 94, 0.6),
+        0 0 24px rgba(240, 199, 94, 0.2),
+        inset 0 1px 3px rgba(0, 0, 0, 0.3);
+    transform: translateX(-50%) scale(0.9);
+    background: radial-gradient(circle at 45% 45%, #ffe88a, #c49000);
+}
+
+/* Hover feedback */
+.note-pin:hover {
+    transform: translateX(-50%) scale(1.15);
+}
+
+.note-pin.pinned:hover {
+    transform: translateX(-50%) scale(1.0);
+}
+
+/* Pin pulse animation on toggle */
+@keyframes pinPulse {
+    0% {
+        transform: translateX(-50%) scale(1);
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.3);
+    }
+
+    100% {
+        transform: translateX(-50%) scale(1);
+    }
+}
+
+.note-pin.animate {
+    animation: pinPulse 0.3s ease;
+}
+
+/* ===== NOTE BODY ===== */
+.note-body {
+    flex: 1;
+    width: calc(100% - 16px);
+    margin: 14px 8px 8px;
+    padding: 24px 20px 16px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+    transition: filter 0.3s ease;
+}
+
+.note-window:hover .note-body {
+    filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4));
+}
+
+/* Subtle inner glow */
+.note-body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.06) 0%,
+            transparent 50%,
+            rgba(0, 0, 0, 0.06) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ===== TEXT ===== */
+.note-title {
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+    outline: none;
+    opacity: 0.9;
+    min-height: 1.2em;
+    color: inherit;
+    position: relative;
+    z-index: 2;
+    user-select: text;
+    cursor: text;
+}
+
+.note-title:empty::before {
+    content: 'Titre...';
+    opacity: 0.4;
+}
+
+.note-text {
+    font-family: var(--font-handwritten);
+    font-size: 1.15rem;
+    line-height: 1.4;
+    flex: 1;
+    outline: none;
+    word-break: break-word;
+    min-height: 1.4em;
+    color: inherit;
+    position: relative;
+    z-index: 2;
+    user-select: text;
+    cursor: text;
+}
+
+.note-text:empty::before {
+    content: 'Écris quelque chose...';
+    opacity: 0.35;
+    font-style: italic;
+}
+
+/* ===== SHAPE: SQUARE ===== */
+.note-window.shape-square .note-body {
+    border-radius: 4px;
+}
+
+/* ===== SHAPE: ROUNDED ===== */
+.note-window.shape-rounded .note-body {
+    border-radius: 20px;
+    padding: 24px 22px 18px;
+}
+
+/* ===== SHAPE: HEART ===== */
+.note-window.shape-heart .note-body {
+    border-radius: 0;
+    clip-path: polygon(50% 92%,
+            18% 66%, 6% 50%, 1% 36%, 0% 24%,
+            2% 14%, 8% 6%, 17% 1%, 28% 0%, 38% 2%, 50% 16%,
+            62% 2%, 72% 0%, 83% 1%, 92% 6%, 98% 14%,
+            100% 24%, 99% 36%, 94% 50%, 82% 66%);
+    margin: 4px;
+    padding: 20px;
+}
+
+.note-window.shape-heart .note-body::before {
+    display: none;
+}
+
+.note-window.shape-heart .note-content-area {
+    position: absolute;
+    top: 22%;
+    left: 20%;
+    right: 20%;
+    bottom: 22%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* ===== SHAPE: STAR ===== */
+.note-window.shape-star .note-body {
+    border-radius: 0;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    margin: 4px;
+    padding: 20px;
+}
+
+.note-window.shape-star .note-body::before {
+    display: none;
+}
+
+.note-window.shape-star .note-content-area {
+    position: absolute;
+    top: 34%;
+    left: 30%;
+    right: 30%;
+    bottom: 30%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* ===== SHAPE: CIRCLE ===== */
+.note-window.shape-circle .note-body {
+    border-radius: 50%;
+    clip-path: ellipse(50% 50%);
+    margin: 4px;
+    padding: 20px;
+}
+
+.note-window.shape-circle .note-body::before {
+    display: none;
+}
+
+.note-window.shape-circle .note-content-area {
+    position: absolute;
+    top: 20%;
+    left: 16%;
+    right: 16%;
+    bottom: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* ===== SHAPE: CLOUD ===== */
+.note-window.shape-cloud .note-body {
+    border-radius: 100px;
+    margin: 4px;
+    padding: 20px;
+}
+
+.note-window.shape-cloud .note-content-area {
+    position: absolute;
+    top: 18%;
+    left: 16%;
+    right: 16%;
+    bottom: 18%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    overflow: hidden;
+    z-index: 2;
+}
+
+/* Clip-path shapes: smaller text to fit */
+.note-window.shape-heart .note-title,
+.note-window.shape-circle .note-title,
+.note-window.shape-cloud .note-title {
+    font-size: 0.72rem;
+    margin-bottom: 3px;
+}
+
+.note-window.shape-heart .note-text,
+.note-window.shape-circle .note-text,
+.note-window.shape-cloud .note-text {
+    font-size: 0.82rem;
+    line-height: 1.2;
+}
+
+.note-window.shape-star .note-title {
+    font-size: 0.65rem;
+    margin-bottom: 2px;
+}
+
+.note-window.shape-star .note-text {
+    font-size: 0.72rem;
+    line-height: 1.15;
+}
+
+/* ===== GLITTER ===== */
+.glitter-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.glitter-particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: sparkle var(--dur, 2s) ease-in-out infinite;
+    opacity: 0;
+    will-change: opacity, transform;
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: scale(1.2);
+    }
+}
+
+/* ===== NOTE COLORS (Midnights) ===== */
+.note-color-0 .note-body {
+    background: linear-gradient(135deg, #1a3260, #1e3a6e);
+    color: #c4d4f0;
+}
+
+.note-color-1 .note-body {
+    background: linear-gradient(135deg, #2d2660, #3d2b7b);
+    color: #d4c4f0;
+}
+
+.note-color-2 .note-body {
+    background: linear-gradient(135deg, #1a4040, #1a5050);
+    color: #b0e0e0;
+}
+
+.note-color-3 .note-body {
+    background: linear-gradient(135deg, #141830, #1a2040);
+    color: #a0b0d0;
+}
+
+.note-color-4 .note-body {
+    background: linear-gradient(135deg, #4a3a1a, #5a4a2a);
+    color: #f0d89e;
+}
+
+/* ===== NOTE COLORS (Lover) ===== */
+[data-theme="lover"] .note-color-0 .note-body {
+    background: linear-gradient(135deg, #e080a8, #e060a0);
+    color: #fff0f5;
+}
+
+[data-theme="lover"] .note-color-1 .note-body {
+    background: linear-gradient(135deg, #c090e0, #b070d0);
+    color: #f5f0ff;
+}
+
+[data-theme="lover"] .note-color-2 .note-body {
+    background: linear-gradient(135deg, #80c0c0, #60b0b0);
+    color: #f0ffff;
+}
+
+[data-theme="lover"] .note-color-3 .note-body {
+    background: linear-gradient(135deg, #f0b0c0, #e898b0);
+    color: #fff0f0;
+}
+
+[data-theme="lover"] .note-color-4 .note-body {
+    background: linear-gradient(135deg, #e0c070, #d0a858);
+    color: #fff8e8;
+}
+
+/* Glitter particle colors */
+.note-color-0 .glitter-particle {
+    background: #a8c0f0;
+}
+
+.note-color-1 .glitter-particle {
+    background: #d4a8f0;
+}
+
+.note-color-2 .glitter-particle {
+    background: #a8f0d4;
+}
+
+.note-color-3 .glitter-particle {
+    background: #8090c0;
+}
+
+.note-color-4 .glitter-particle {
+    background: #f0c75e;
+}

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwiftNotes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Patrick+Hand&family=Quicksand:wght@400;600;700&family=Satisfy&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/src/styles/note.css" />
+</head>
+
+<body>
+    <div class="note-window" id="note-window">
+        <!-- Gold pin decoration -->
+        <div class="note-pin" id="note-pin"></div>
+
+        <!-- Note body -->
+        <div class="note-body" id="note-body">
+            <div class="note-title" contenteditable="true" spellcheck="false"></div>
+            <div class="note-text" contenteditable="true" spellcheck="false"></div>
+
+            <!-- Glitter container (inside body for clipping) -->
+            <div class="glitter-container" id="glitter-container"></div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/scripts/note-app.js"></script>
+</body>
+
+</html>

@@ -36,7 +36,10 @@ async function getDataFilePath() {
         tauriPath = await import('@tauri-apps/api/path');
     }
     const appDataDir = await tauriPath.appDataDir();
-    return appDataDir + FILE_NAME;
+    // Ensure trailing separator
+    const sep = appDataDir.includes('/') ? '/' : '\\';
+    const dir = appDataDir.endsWith(sep) ? appDataDir : appDataDir + sep;
+    return dir + FILE_NAME;
 }
 
 /**
@@ -133,13 +136,21 @@ async function saveImmediate() {
 }
 
 /**
- * Save data with debounce (500ms)
+ * Save data with debounce (500ms) — for frequent updates like typing
  */
 export function saveData() {
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
         saveImmediate();
     }, 500);
+}
+
+/**
+ * Save data immediately — for critical operations (create/delete)
+ */
+export async function saveDataNow() {
+    if (saveTimeout) clearTimeout(saveTimeout);
+    await saveImmediate();
 }
 
 /**

@@ -1,0 +1,45 @@
+/* ===== SwiftNotes — Theme Variables ===== */
+/* Themes define CSS variables used across all windows */
+
+/* ===== 🌙 Midnights (Default) ===== */
+:root,
+[data-theme="midnights"] {
+    --bg: #0f1729;
+    --bg-deeper: #0a101f;
+    --surface: #1a2540;
+    --surface-hover: #213058;
+    --border: #2a3a5c;
+    --text: #e8ecf4;
+    --text-muted: #7b8ab0;
+    --accent: #7c9cdb;
+    --star-gold: #f0c75e;
+    --star-glow: rgba(240, 199, 94, 0.3);
+
+    /* Note colors (indexed 1-5) */
+    --note-1: linear-gradient(135deg, #1a3260, #1e3a6e);
+    --note-2: linear-gradient(135deg, #2d2660, #3d2b7b);
+    --note-3: linear-gradient(135deg, #1a4040, #1a5050);
+    --note-4: linear-gradient(135deg, #141830, #1a2040);
+    --note-5: linear-gradient(135deg, #4a3a1a, #5a4a2a);
+}
+
+/* ===== 💗 Lover ===== */
+[data-theme="lover"] {
+    --bg: #f8e8f0;
+    --bg-deeper: #f0d8e8;
+    --surface: #fceef5;
+    --surface-hover: #f8dce8;
+    --border: #e8c0d8;
+    --text: #4a2040;
+    --text-muted: #9a7088;
+    --accent: #e060a0;
+    --star-gold: #f0c75e;
+    --star-glow: rgba(240, 199, 94, 0.3);
+
+    /* Note colors */
+    --note-1: linear-gradient(135deg, #e080a8, #e060a0);
+    --note-2: linear-gradient(135deg, #c090e0, #b070d0);
+    --note-3: linear-gradient(135deg, #80c0c0, #60b0b0);
+    --note-4: linear-gradient(135deg, #f0b0c0, #e898b0);
+    --note-5: linear-gradient(135deg, #e0c070, #d0a858);
+}

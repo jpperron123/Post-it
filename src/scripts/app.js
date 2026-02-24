@@ -1,179 +1,278 @@
-/* ===== SwiftNotes — Main App ===== */
-/* Entry point: initialization, global event listeners, keyboard shortcuts */
+/* ===== SwiftNotes — Manager App ===== */
+/* Dashboard with starfield, creation toolbar, notes list */
 
-import { loadData, getNotes } from './storage.js';
-import { renderAllNotes, renderSidebar, createNote, deleteNote, duplicateNote, selectNote, deselectAll, getSelectedNoteId, onNoteSelectionChange, updateNote } from './notes.js';
-import { initDrag } from './drag.js';
-import { initTheme, applyTheme } from './themes.js';
-import { initToolbar, updateToolbarState } from './toolbar.js';
+import { loadData, getNotes, saveData, saveDataNow, generateId, getSettings, updateSettings } from './storage.js';
+import { openNoteWindow, closeNoteWindow, isTauri } from './windows.js';
+
+const SHAPE_ICONS = { square: '📝', rounded: '📒', heart: '💜', star: '⭐', circle: '🔵', cloud: '☁️' };
+
+const COLOR_GRADIENTS = {
+    midnights: [
+        ['#1a3260', '#1e3a6e'],
+        ['#2d2660', '#3d2b7b'],
+        ['#1a4040', '#1a5050'],
+        ['#141830', '#1a2040'],
+        ['#4a3a1a', '#5a4a2a'],
+    ],
+    lover: [
+        ['#e080a8', '#e060a0'],
+        ['#c090e0', '#b070d0'],
+        ['#80c0c0', '#60b0b0'],
+        ['#f0b0c0', '#e898b0'],
+        ['#e0c070', '#d0a858'],
+    ],
+};
+
+/** Creation toolbar state */
+let selectedShape = 'square';
+let selectedColor = 0;
+let selectedGlitter = false;
 
 /**
- * Initialize the app
+ * Initialize the manager
  */
 async function init() {
-    // Load saved data (async in Tauri, sync in web)
     await loadData();
-
-    // Initialize theme
-    initTheme();
-
-    // Generate starfield
+    applyTheme();
     generateStarfield();
+    renderColorButtons();
+    renderNotesList();
+    setupToolbar();
+    setupButtons();
 
-    // Initialize drag & drop
-    initDrag(
-        // On drag end: save position
-        (noteId, x, y) => {
-            updateNote(noteId, { position: { x, y } });
-        },
-        // On click (not drag): select note
-        (noteId, noteEl) => {
-            selectNote(noteId);
+    // Open all existing note windows on startup
+    if (isTauri()) {
+        const notes = getNotes();
+        for (const note of notes) {
+            await openNoteWindow(note.id);
         }
-    );
-
-    // Initialize toolbar
-    initToolbar();
-
-    // Selection change → update toolbar
-    onNoteSelectionChange((noteId) => {
-        updateToolbarState();
-    });
-
-    // Render notes
-    renderAllNotes();
-    renderSidebar();
-
-    // Event listeners
-    setupEventListeners();
+    }
 }
 
 /**
  * Generate starfield background
  */
 function generateStarfield() {
-    const starfield = document.getElementById('starfield');
-    for (let i = 0; i < 100; i++) {
+    const container = document.getElementById('starfield');
+    container.innerHTML = '';
+    for (let i = 0; i < 80; i++) {
         const star = document.createElement('div');
         star.className = 'star';
         star.style.left = Math.random() * 100 + '%';
         star.style.top = Math.random() * 100 + '%';
         star.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
         star.style.animationDelay = -Math.random() * 5 + 's';
-        const size = 1 + Math.random() * 2;
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
-        starfield.appendChild(star);
+        const size = (1 + Math.random() * 2) + 'px';
+        star.style.width = size;
+        star.style.height = size;
+        container.appendChild(star);
     }
 }
 
 /**
- * Set up global event listeners
+ * Apply current theme
  */
-function setupEventListeners() {
-    // New Note button
-    document.getElementById('btn-new-note').addEventListener('click', () => {
-        createNote();
+function applyTheme() {
+    const theme = getSettings().theme || 'midnights';
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelectorAll('.theme-dot').forEach(dot => {
+        dot.classList.toggle('active', dot.dataset.theme === theme);
+    });
+}
+
+/**
+ * Get current theme name
+ */
+function getTheme() {
+    return getSettings().theme || 'midnights';
+}
+
+/**
+ * Render the color buttons in the creation toolbar
+ */
+function renderColorButtons() {
+    const container = document.getElementById('tb-colors');
+    container.innerHTML = '';
+    const colors = COLOR_GRADIENTS[getTheme()] || COLOR_GRADIENTS.midnights;
+    for (let i = 0; i < 5; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'tb-color';
+        if (i === selectedColor) btn.classList.add('active');
+        btn.style.background = `linear-gradient(135deg, ${colors[i][0]}, ${colors[i][1]})`;
+        btn.dataset.color = i;
+        btn.addEventListener('click', () => {
+            selectedColor = i;
+            container.querySelectorAll('.tb-color').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+        container.appendChild(btn);
+    }
+}
+
+/**
+ * Setup creation toolbar interactions
+ */
+function setupToolbar() {
+    // Shape buttons
+    document.querySelectorAll('.tb-shape').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedShape = btn.dataset.shape;
+            document.querySelectorAll('.tb-shape').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // Glitter toggle
+    const glitterBtn = document.getElementById('tb-glitter');
+    glitterBtn.addEventListener('click', () => {
+        selectedGlitter = !selectedGlitter;
+        glitterBtn.classList.toggle('active', selectedGlitter);
+    });
+}
+
+/**
+ * Render the notes list in the manager
+ */
+function renderNotesList() {
+    const list = document.getElementById('notes-list');
+    const empty = document.getElementById('empty-state');
+    const notes = getNotes();
+
+    // Clear list (keep empty state)
+    list.querySelectorAll('.note-item').forEach(el => el.remove());
+
+    if (notes.length === 0) {
+        empty.style.display = '';
+        return;
+    }
+    empty.style.display = 'none';
+
+    const colors = COLOR_GRADIENTS[getTheme()] || COLOR_GRADIENTS.midnights;
+
+    for (const note of notes) {
+        const item = document.createElement('div');
+        item.className = 'note-item';
+        item.dataset.id = note.id;
+
+        // Color swatch
+        const colorDiv = document.createElement('div');
+        colorDiv.className = 'note-item-color';
+        const ci = note.colorIndex ?? 0;
+        colorDiv.style.background = `linear-gradient(135deg, ${colors[ci][0]}, ${colors[ci][1]})`;
+        colorDiv.textContent = SHAPE_ICONS[note.shape || 'square'] || '📝';
+
+        // Info
+        const info = document.createElement('div');
+        info.className = 'note-item-info';
+        const title = document.createElement('div');
+        title.className = 'note-item-title';
+        title.textContent = note.title || 'Sans titre';
+        const preview = document.createElement('div');
+        preview.className = 'note-item-preview';
+        preview.textContent = note.text || 'Vide...';
+        info.appendChild(title);
+        info.appendChild(preview);
+
+        // Actions
+        const actions = document.createElement('div');
+        actions.className = 'note-item-actions';
+
+        // Show/focus button
+        const showBtn = document.createElement('button');
+        showBtn.className = 'note-item-btn';
+        showBtn.textContent = '👁️';
+        showBtn.title = 'Afficher';
+        showBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isTauri()) openNoteWindow(note.id);
+        });
+
+        // Delete button
+        const delBtn = document.createElement('button');
+        delBtn.className = 'note-item-btn delete';
+        delBtn.textContent = '🗑️';
+        delBtn.title = 'Supprimer';
+        delBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            // Close the note window first
+            if (isTauri()) await closeNoteWindow(note.id);
+            // Remove from data
+            const idx = getNotes().findIndex(n => n.id === note.id);
+            if (idx !== -1) getNotes().splice(idx, 1);
+            await saveDataNow(); // Immediate save!
+            renderNotesList();
+        });
+
+        actions.appendChild(showBtn);
+        actions.appendChild(delBtn);
+
+        item.appendChild(colorDiv);
+        item.appendChild(info);
+        item.appendChild(actions);
+
+        // Click item → open/focus window
+        item.addEventListener('click', () => {
+            if (isTauri()) openNoteWindow(note.id);
+        });
+
+        list.appendChild(item);
+    }
+}
+
+/**
+ * Setup interactive buttons
+ */
+function setupButtons() {
+    // New Note — uses selected shape/color/glitter from toolbar
+    document.getElementById('btn-new-note').addEventListener('click', async () => {
+        const notes = getNotes();
+        const newNote = {
+            id: generateId(),
+            title: '',
+            text: '',
+            shape: selectedShape,
+            colorIndex: selectedColor,
+            font: 'Caveat',
+            glitter: selectedGlitter,
+            pinned: false,
+            position: {
+                x: 100 + Math.random() * 300,
+                y: 100 + Math.random() * 200,
+            },
+            size: null,
+            createdAt: Date.now(),
+        };
+        notes.push(newNote);
+        console.log('[Manager] Creating note:', newNote.id, 'shape:', newNote.shape, 'color:', newNote.colorIndex);
+        await saveDataNow(); // Immediate save — must complete before opening window
+        console.log('[Manager] Data saved, notes count:', getNotes().length);
+        renderNotesList();
+
+        if (isTauri()) {
+            // Small delay to ensure the file is flushed to disk
+            await new Promise(r => setTimeout(r, 300));
+            await openNoteWindow(newNote.id);
+        }
     });
 
     // Theme selector
     document.querySelectorAll('.theme-dot').forEach(dot => {
-        dot.addEventListener('click', () => {
-            applyTheme(dot.dataset.theme);
-            // Re-render notes to apply new theme colors
-            renderAllNotes();
-            renderSidebar();
+        dot.addEventListener('click', async () => {
+            const theme = dot.dataset.theme;
+            updateSettings({ theme });
+            applyTheme();
+            renderColorButtons(); // Update color previews for new theme
+            renderNotesList();
+            await saveDataNow();
         });
     });
-
-    // Deselect on board click (not on a note)
-    document.getElementById('board').addEventListener('mousedown', (e) => {
-        if (e.target.id === 'board') {
-            deselectAll();
-        }
-    });
-
-    // Context menu actions
-    document.getElementById('context-menu').addEventListener('click', (e) => {
-        const action = e.target.closest('.context-item')?.dataset.action;
-        const noteId = document.getElementById('context-menu').dataset.noteId;
-        if (!action || !noteId) return;
-
-        document.getElementById('context-menu').classList.remove('visible');
-
-        switch (action) {
-            case 'edit': {
-                selectNote(noteId);
-                const textEl = document.querySelector(`.postit[data-id="${noteId}"] .postit-text`);
-                if (textEl) textEl.focus();
-                break;
-            }
-            case 'duplicate':
-                duplicateNote(noteId);
-                break;
-            case 'pin': {
-                const notes = getNotes();
-                const note = notes.find(n => n.id === noteId);
-                if (note) {
-                    updateNote(noteId, { pinned: !note.pinned, alwaysOnTop: !note.alwaysOnTop });
-                }
-                break;
-            }
-            case 'delete':
-                if (confirm('Delete this note?')) {
-                    deleteNote(noteId);
-                }
-                break;
-        }
-    });
-
-    // Keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        // Don't trigger shortcuts when editing text
-        const isEditing = document.activeElement?.contentEditable === 'true';
-
-        // Ctrl+N → New note
-        if (e.ctrlKey && e.key === 'n') {
-            e.preventDefault();
-            createNote();
-            return;
-        }
-
-        // Ctrl+D → Duplicate selected note
-        if (e.ctrlKey && e.key === 'd') {
-            e.preventDefault();
-            const noteId = getSelectedNoteId();
-            if (noteId) duplicateNote(noteId);
-            return;
-        }
-
-        // Escape → Deselect / close popups
-        if (e.key === 'Escape') {
-            document.getElementById('font-popup').classList.remove('visible');
-            document.getElementById('context-menu').classList.remove('visible');
-            deselectAll();
-            // Blur active element
-            if (document.activeElement) document.activeElement.blur();
-            return;
-        }
-
-        // Delete / Backspace → Delete selected note (only when not editing)
-        if ((e.key === 'Delete' || e.key === 'Backspace') && !isEditing) {
-            const noteId = getSelectedNoteId();
-            if (noteId) {
-                e.preventDefault();
-                if (confirm('Delete this note?')) {
-                    deleteNote(noteId);
-                }
-            }
-        }
-    });
-
-    // Close context menu on scroll
-    document.addEventListener('scroll', () => {
-        document.getElementById('context-menu').classList.remove('visible');
-    }, true);
 }
 
-// Boot!
-document.addEventListener('DOMContentLoaded', init);
+// Start
+init();
+
+// Refresh list periodically (notes might change text from note windows)
+setInterval(async () => {
+    await loadData();
+    renderNotesList();
+}, 3000);
