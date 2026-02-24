@@ -1,70 +1,108 @@
 /* ===== Post-it Shapes ===== */
 
-/* Shape: Square */
+/* Content wrapper */
+.postit-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: visible;
+}
+
+/* ========== Shape: Square ========== */
 .postit.shape-square {
-    width: 220px;
-    height: 220px;
+    min-width: 220px;
+    min-height: 220px;
 }
 
 .postit.shape-square .postit-inner {
     border-radius: 4px;
 }
 
-/* Shape: Rounded */
+/* ========== Shape: Rounded ========== */
 .postit.shape-rounded {
-    width: 220px;
-    height: 200px;
+    min-width: 220px;
+    min-height: 200px;
 }
 
 .postit.shape-rounded .postit-inner {
     border-radius: 20px;
+    padding: 22px;
 }
 
-/* Shape: Heart — enlarged + generous padding to contain text */
+/* ========== Shape: Heart (polygon % — scales with element) ========== */
 .postit.shape-heart {
+    min-width: 260px;
+    min-height: 240px;
     width: 260px;
     height: 240px;
 }
 
 .postit.shape-heart .postit-inner {
-    clip-path: path("M 130 215 C 50 168, -12 96, 36 48 C 72 12, 118 24, 130 60 C 142 24, 190 12, 224 48 C 272 96, 212 168, 130 215 Z");
-    padding: 70px 55px 60px;
+    clip-path: polygon(50% 92%,
+            18% 66%, 6% 50%, 1% 36%, 0% 24%,
+            2% 14%, 8% 6%, 17% 1%, 28% 0%, 38% 2%, 50% 16%,
+            62% 2%, 72% 0%, 83% 1%, 92% 6%, 98% 14%,
+            100% 24%, 99% 36%, 94% 50%, 82% 66%, 50% 92%);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.postit.shape-heart .postit-content {
     text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    max-width: 55%;
 }
 
 .postit.shape-heart .postit-title {
-    font-size: 0.75rem;
-    margin-bottom: 4px;
+    font-size: 0.72rem;
+    margin-bottom: 2px;
 }
 
 .postit.shape-heart .postit-text {
-    font-size: 0.95rem;
-    line-height: 1.3;
+    font-size: 0.88rem;
+    line-height: 1.25;
 }
 
 .postit.shape-heart .postit-footer {
     display: none;
 }
 
-/* Shape: Star — enlarged + massive padding for center area */
+/* ========== Shape: Star (polygon % — scales with element) ========== */
 .postit.shape-star {
+    min-width: 280px;
+    min-height: 270px;
     width: 280px;
     height: 270px;
 }
 
 .postit.shape-star .postit-inner {
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    padding: 90px 70px 80px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.postit.shape-star .postit-content {
     text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    max-width: 42%;
 }
 
 .postit.shape-star .postit-title {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     margin-bottom: 2px;
 }
 
 .postit.shape-star .postit-text {
-    font-size: 0.9rem;
+    font-size: 0.82rem;
     line-height: 1.2;
 }
 
@@ -72,54 +110,83 @@
     display: none;
 }
 
-/* Shape: Circle */
+/* ========== Shape: Circle (ellipse % — scales with element) ========== */
 .postit.shape-circle {
+    min-width: 220px;
+    min-height: 220px;
     width: 220px;
     height: 220px;
 }
 
 .postit.shape-circle .postit-inner {
     border-radius: 50%;
-    clip-path: circle(50%);
-    padding: 55px 40px;
+    clip-path: ellipse(50% 50%);
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.postit.shape-circle .postit-content {
     text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    max-width: 65%;
 }
 
 .postit.shape-circle .postit-title {
-    font-size: 0.75rem;
-    margin-bottom: 4px;
+    font-size: 0.72rem;
+    margin-bottom: 3px;
 }
 
 .postit.shape-circle .postit-text {
-    font-size: 1rem;
-    line-height: 1.3;
+    font-size: 0.95rem;
+    line-height: 1.25;
 }
 
 .postit.shape-circle .postit-footer {
     display: none;
 }
 
-/* Shape: Cloud */
+/* ========== Shape: Cloud ========== */
 .postit.shape-cloud {
+    min-width: 270px;
+    min-height: 190px;
     width: 270px;
     height: 190px;
 }
 
 .postit.shape-cloud .postit-inner {
     border-radius: 100px;
-    padding: 45px 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.postit.shape-cloud .postit-content {
     text-align: center;
+    align-items: center;
+    padding: 10px;
+    max-width: 65%;
+}
+
+.postit.shape-cloud .postit-title {
+    font-size: 0.75rem;
+    margin-bottom: 3px;
 }
 
 .postit.shape-cloud .postit-text {
-    font-size: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.3;
 }
 
-/* Global: clip-path shapes hide overflow */
-.postit.shape-heart .postit-text,
-.postit.shape-star .postit-text,
-.postit.shape-circle .postit-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word;
+.postit.shape-cloud .postit-footer {
+    display: none;
+}
+
+/* Transition for smooth resizing */
+.postit {
+    transition: width 0.25s ease, height 0.25s ease, filter 0.3s ease;
 }

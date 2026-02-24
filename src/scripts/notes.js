@@ -14,8 +14,85 @@ const SHAPE_ICONS = {
     cloud: '☁️',
 };
 
+// Base dimensions for each shape
+const BASE_SIZES = {
+    square: { w: 220, h: 220, proportional: false },
+    rounded: { w: 220, h: 200, proportional: false },
+    heart: { w: 260, h: 240, proportional: true },
+    star: { w: 280, h: 270, proportional: true },
+    circle: { w: 220, h: 220, proportional: true },
+    cloud: { w: 270, h: 190, proportional: false },
+};
+
 let selectedNoteId = null;
 let onSelectionChange = null;
+
+/**
+ * Auto-resize a note's shape based on its content
+ */
+function autoResizeNote(noteEl) {
+    const content = noteEl.querySelector('.postit-content');
+    if (!content) return;
+
+    const shape = noteEl.className.match(/shape-(\w+)/)?.[1] || 'square';
+    const base = BASE_SIZES[shape] || BASE_SIZES.square;
+
+    // Measure how much space the content needs
+    const contentH = content.scrollHeight;
+    const contentW = content.scrollWidth;
+    const currentH = noteEl.offsetHeight;
+    const currentW = noteEl.offsetWidth;
+
+    // For proportional shapes, check if content overflows the inner area
+    const inner = noteEl.querySelector('.postit-inner');
+    if (!inner) return;
+
+    // Calculate needed growth
+    const contentArea = content.getBoundingClientRect();
+    const overflow = contentH - contentArea.height;
+
+    if (overflow > 5) {
+        // Content overflows — grow the shape
+        const growPixels = overflow + 20; // extra breathing room
+
+        if (base.proportional) {
+            // Maintain aspect ratio
+            const ratio = base.w / base.h;
+            const newH = currentH + growPixels;
+            const newW = Math.round(newH * ratio);
+            noteEl.style.width = newW + 'px';
+            noteEl.style.height = newH + 'px';
+        } else {
+            // Just grow height
+            noteEl.style.height = (currentH + growPixels) + 'px';
+        }
+    } else if (overflow < -30 && currentH > base.h) {
+        // Content shrank — shrink back (but not below base size)
+        const shrinkPixels = Math.min(-overflow - 20, currentH - base.h);
+        if (shrinkPixels > 10) {
+            if (base.proportional) {
+                const ratio = base.w / base.h;
+                const newH = Math.max(base.h, currentH - shrinkPixels);
+                const newW = Math.round(newH * ratio);
+                noteEl.style.width = newW + 'px';
+                noteEl.style.height = newH + 'px';
+            } else {
+                noteEl.style.height = Math.max(base.h, currentH - shrinkPixels) + 'px';
+            }
+        }
+    }
+
+    // Update data model
+    const noteId = noteEl.dataset.id;
+    const notes = getNotes();
+    const note = notes.find(n => n.id === noteId);
+    if (note) {
+        note.size = {
+            width: noteEl.offsetWidth,
+            height: noteEl.offsetHeight,
+        };
+    }
+}
 
 /**
  * Set selection change callback
@@ -203,6 +280,13 @@ export function renderNote(note) {
     noteEl.style.top = note.position.y + 'px';
     noteEl.style.transform = `rotate(${note.rotation}deg)`;
 
+    // Apply saved size if the note was resized
+    const base = BASE_SIZES[note.shape] || BASE_SIZES.square;
+    if (note.size && (note.size.width > base.w || note.size.height > base.h)) {
+        noteEl.style.width = note.size.width + 'px';
+        noteEl.style.height = note.size.height + 'px';
+    }
+
     // Pin decoration
     const pin = document.createElement('div');
     pin.className = 'pin';
@@ -234,6 +318,7 @@ export function renderNote(note) {
             saveData();
             renderSidebar();
         }
+        autoResizeNote(noteEl);
     });
     title.addEventListener('mousedown', e => e.stopPropagation());
 
@@ -252,6 +337,7 @@ export function renderNote(note) {
             saveData();
             renderSidebar();
         }
+        autoResizeNote(noteEl);
     });
     text.addEventListener('mousedown', e => e.stopPropagation());
 
@@ -267,9 +353,13 @@ export function renderNote(note) {
         footer.appendChild(pinSpan);
     }
 
-    inner.appendChild(title);
-    inner.appendChild(text);
-    inner.appendChild(footer);
+    // Content wrapper — constrains text area for clip-path shapes
+    const content = document.createElement('div');
+    content.className = 'postit-content';
+    content.appendChild(title);
+    content.appendChild(text);
+    content.appendChild(footer);
+    inner.appendChild(content);
     noteEl.appendChild(inner);
 
     // Glitter
