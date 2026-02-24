@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SwiftNotes ✨</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Patrick+Hand&family=Quicksand:wght@400;600;700&family=Satisfy&display=swap"
+        rel="stylesheet" />
+  <script type="module" crossorigin src="/assets/main-CJF_ykaK.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/storage-BywOdFAf.js">
+  <link rel="stylesheet" crossorigin href="/assets/main-B7rknIBR.css">
+</head>
+
+<body>
+
+    <!-- Starfield background -->
+    <div class="starfield" id="starfield"></div>
+
+    <div class="manager">
+        <!-- Header -->
+        <div class="manager-header">
+            <div class="logo">
+                <span class="logo-icon">🌙</span>
+                <span class="logo-text">Swift<span>Notes</span></span>
+            </div>
+        </div>
+
+        <!-- Creation toolbar -->
+        <div class="creation-toolbar">
+            <button class="new-note-btn" id="btn-new-note">✨ Nouvelle Note</button>
+
+            <div class="toolbar-row">
+                <div class="tb-label">Forme</div>
+                <div class="tb-shapes" id="tb-shapes">
+                    <button class="tb-shape active" data-shape="square" title="Carré">📝</button>
+                    <button class="tb-shape" data-shape="rounded" title="Arrondi">📒</button>
+                    <button class="tb-shape" data-shape="heart" title="Coeur">💜</button>
+                    <button class="tb-shape" data-shape="star" title="Étoile">⭐</button>
+                    <button class="tb-shape" data-shape="circle" title="Cercle">🔵</button>
+                    <button class="tb-shape" data-shape="cloud" title="Nuage">☁️</button>
+                </div>
+            </div>
+
+            <div class="toolbar-row">
+                <div class="tb-label">Couleur</div>
+                <div class="tb-colors" id="tb-colors"></div>
+            </div>
+
+            <div class="toolbar-row">
+                <button class="tb-glitter" id="tb-glitter">✨ Glitter</button>
+            </div>
+        </div>
+
+        <!-- Notes list -->
+        <div class="notes-list" id="notes-list">
+            <div class="notes-list-empty" id="empty-state">
+                <span class="empty-icon">🌙</span>
+                <p>Aucune note encore...</p>
+                <p>Clique sur "Nouvelle Note" pour commencer!</p>
+            </div>
+        </div>
+
+        <!-- Footer with theme selector -->
+        <div class="manager-footer">
+            <span class="theme-label">Thème</span>
+            <div class="theme-selector" id="theme-selector">
+                <button class="theme-dot midnights" data-theme="midnights" title="Midnights"></button>
+                <button class="theme-dot lover" data-theme="lover" title="Lover"></button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
