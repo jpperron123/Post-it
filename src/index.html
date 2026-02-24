@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SwiftNotes — Magical sticky notes ✨</title>
+  <meta name="description" content="Magical sticky notes for your desktop, inspired by Taylor Swift Eras">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Patrick+Hand&family=Quicksand:wght@400;500;600;700&family=Satisfy&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles/main.css">
+  <link rel="stylesheet" href="./styles/themes/midnights.css">
+  <link rel="stylesheet" href="./styles/shapes.css">
+  <link rel="stylesheet" href="./styles/glitter.css">
+</head>
+<body>
+
+  <!-- STARFIELD BACKGROUND -->
+  <div class="starfield" id="starfield"></div>
+  <div class="moon"></div>
+
+  <div class="app" id="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <span class="logo-icon">🌙</span>
+          <span class="logo-text">Swift<span>Notes</span></span>
+        </div>
+        <button class="new-note-btn" id="btn-new-note">✨ New Note</button>
+      </div>
+
+      <div class="notes-list" id="notes-list">
+        <!-- Dynamically populated -->
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="theme-selector" id="theme-selector">
+          <span class="theme-selector-label">Era</span>
+          <div class="theme-dot midnights active" data-theme="midnights" title="Midnights"></div>
+          <div class="theme-dot lover" data-theme="lover" title="Lover"></div>
+          <div class="theme-dot folklore" data-theme="folklore" title="Folklore"></div>
+          <div class="theme-dot reputation" data-theme="reputation" title="Reputation"></div>
+          <div class="theme-dot ts1989" data-theme="1989" title="1989"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- BOARD -->
+    <div class="board" id="board">
+      <!-- Post-it notes rendered here dynamically -->
+    </div>
+
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar" id="toolbar">
+    <!-- Shapes -->
+    <div class="toolbar-section" id="toolbar-shapes">
+      <button class="toolbar-btn" data-shape="square" title="Square">
+        <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="1" fill="currentColor"/></svg>
+      </button>
+      <button class="toolbar-btn" data-shape="rounded" title="Rounded">
+        <svg width="16" height="16" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="5" fill="currentColor"/></svg>
+      </button>
+      <button class="toolbar-btn" data-shape="heart" title="Heart">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 14s-5.5-3.5-5.5-7.5C2.5 4 4 2.5 5.5 2.5c1 0 2 .5 2.5 1.5.5-1 1.5-1.5 2.5-1.5C12 2.5 13.5 4 13.5 6.5 13.5 10.5 8 14 8 14z" fill="currentColor"/></svg>
+      </button>
+      <button class="toolbar-btn" data-shape="star" title="Star">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11 3.5 14 5 9 1 6h5z" fill="currentColor"/></svg>
+      </button>
+      <button class="toolbar-btn" data-shape="circle" title="Circle">
+        <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/></svg>
+      </button>
+      <button class="toolbar-btn" data-shape="cloud" title="Cloud">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 12c-2 0-3-1.5-3-3s1-2.5 2.5-3C4 4 6 2 8.5 2c2 0 3.5 1.5 4 3 2 .5 3 2 3 3.5S14 12 12 12z" fill="currentColor"/></svg>
+      </button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Colors -->
+    <div class="toolbar-section" id="toolbar-colors">
+      <button class="color-btn" data-color="deep-blue" title="Deep Blue"></button>
+      <button class="color-btn" data-color="purple" title="Purple"></button>
+      <button class="color-btn" data-color="dark-teal" title="Dark Teal"></button>
+      <button class="color-btn" data-color="midnight" title="Midnight"></button>
+      <button class="color-btn" data-color="gold" title="Gold"></button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Glitter -->
+    <button class="glitter-toggle" id="btn-glitter" title="Toggle Glitter">✨ Glitter</button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Actions -->
+    <button class="toolbar-btn" id="btn-pin" title="Pin to desktop">📌</button>
+    <button class="toolbar-btn" id="btn-font" title="Change font">Aa</button>
+    <button class="toolbar-btn toolbar-btn-delete" id="btn-delete" title="Delete note">
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M5 2V1h6v1h4v2H1V2h4zm1 4v7h1V6H6zm3 0v7h1V6H9zM2 4l1 11h10l1-11H2z" fill="currentColor"/></svg>
+    </button>
+
+    <!-- Font Popup -->
+    <div class="font-popup" id="font-popup">
+      <button class="font-option" data-font="Caveat" style="font-family: 'Caveat', cursive;">Caveat</button>
+      <button class="font-option" data-font="Quicksand" style="font-family: 'Quicksand', sans-serif;">Quicksand</button>
+      <button class="font-option" data-font="Patrick Hand" style="font-family: 'Patrick Hand', cursive;">Patrick Hand</button>
+      <button class="font-option" data-font="Satisfy" style="font-family: 'Satisfy', cursive;">Satisfy</button>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div class="context-menu" id="context-menu">
+    <button class="context-item" data-action="edit">✏️ Edit</button>
+    <button class="context-item" data-action="duplicate">📋 Duplicate</button>
+    <button class="context-item" data-action="pin">📌 Pin to top</button>
+    <div class="context-divider"></div>
+    <button class="context-item context-item-danger" data-action="delete">🗑️ Delete</button>
+  </div>
+
+  <script type="module" src="./scripts/app.js"></script>
+</body>
+</html>

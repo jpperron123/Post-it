@@ -1,0 +1,15 @@
+{
+  "name": "swiftnotes",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Magical sticky notes for your desktop — Taylor Swift Eras inspired",
+  "author": "Jean-Philippe Perron",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.2.0"
+  }
+}

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SwiftNotes — Wireframe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&display=swap');
+
+  :root {
+    --bg: #0f1729;
+    --bg-deeper: #0a101f;
+    --surface: #1a2540;
+    --surface-hover: #213058;
+    --border: #2a3a5c;
+    --text: #e8ecf4;
+    --text-muted: #7b8ab0;
+    --midnight-blue: #1e3a6e;
+    --midnight-purple: #2d2b6b;
+    --star-gold: #f0c75e;
+    --star-glow: rgba(240, 199, 94, 0.3);
+    --moonlight: #c4d4f0;
+    --glitter1: #a8c0f0;
+    --glitter2: #d4a8f0;
+    --glitter3: #f0d4a8;
+    --accent: #7c9cdb;
+    --font: 'Quicksand', sans-serif;
+    --font-handwritten: 'Caveat', cursive;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* ===== STARFIELD BACKGROUND ===== */
+  .starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--dur) ease-in-out infinite;
+    opacity: 0.4;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.5); }
+  }
+
+  .moon {
+    position: fixed;
+    top: 40px;
+    right: 60px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #e8e0d0, #c4b896);
+    box-shadow: 0 0 40px rgba(196, 184, 150, 0.2), 0 0 80px rgba(196, 184, 150, 0.1);
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ===== APP LAYOUT ===== */
+  .app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ===== SIDEBAR (note manager) ===== */
+  .sidebar {
+    width: 280px;
+    background: var(--bg-deeper);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+  }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .logo-text {
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: -0.3px;
+  }
+
+  .logo-text span {
+    color: var(--star-gold);
+  }
+
+  .new-note-btn {
+    width: 100%;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .new-note-btn:hover {
+    background: var(--midnight-blue);
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(124, 156, 219, 0.15);
+  }
+
+  /* Notes list */
+  .notes-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .note-list-item {
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 4px;
+    border: 1px solid transparent;
+  }
+
+  .note-list-item:hover {
+    background: var(--surface);
+  }
+
+  .note-list-item.active {
+    background: var(--surface);
+    border-color: var(--accent);
+  }
+
+  .note-list-item .note-preview-title {
+    font-size: 0.88rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .note-list-item .note-preview-text {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .note-list-item .note-shape-icon {
+    font-size: 0.7rem;
+  }
+
+  /* Sidebar bottom */
+  .sidebar-bottom {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .theme-selector {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .theme-selector-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-right: 4px;
+  }
+
+  .theme-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .theme-dot:hover, .theme-dot.active {
+    border-color: white;
+    transform: scale(1.15);
+  }
+
+  .theme-dot.midnights { background: linear-gradient(135deg, #1e3a6e, #2d2b6b); }
+  .theme-dot.lover { background: linear-gradient(135deg, #f0a0c0, #c090e0); }
+  .theme-dot.folklore { background: linear-gradient(135deg, #c4b896, #8a9a6a); }
+  .theme-dot.reputation { background: linear-gradient(135deg, #1a1a1a, #2ecc40); }
+  .theme-dot.ts1989 { background: linear-gradient(135deg, #87CEEB, #deb887); }
+
+  /* ===== MAIN AREA (post-it board preview) ===== */
+  .board {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* ===== POST-IT NOTES ===== */
+  .postit {
+    position: absolute;
+    cursor: grab;
+    transition: box-shadow 0.3s;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.3));
+  }
+
+  .postit:hover {
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.4));
+    z-index: 10;
+  }
+
+  .postit-inner {
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    min-width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Shape: Square */
+  .postit.shape-square {
+    width: 220px;
+    height: 220px;
+    border-radius: 4px;
+  }
+
+  .postit.shape-square .postit-inner {
+    border-radius: 4px;
+  }
+
+  /* Shape: Rounded */
+  .postit.shape-rounded {
+    width: 220px;
+    height: 200px;
+    border-radius: 20px;
+  }
+
+  .postit.shape-rounded .postit-inner {
+    border-radius: 20px;
+  }
+
+  /* Shape: Heart */
+  .postit.shape-heart {
+    width: 220px;
+    height: 200px;
+  }
+
+  .postit.shape-heart .postit-inner {
+    clip-path: path("M 110 180 C 40 140, -10 80, 30 40 C 60 10, 100 20, 110 50 C 120 20, 160 10, 190 40 C 230 80, 180 140, 110 180 Z");
+    padding: 50px 30px 40px;
+    text-align: center;
+  }
+
+  /* Shape: Star */
+  .postit.shape-star {
+    width: 240px;
+    height: 230px;
+  }
+
+  .postit.shape-star .postit-inner {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    padding: 60px 50px;
+    text-align: center;
+  }
+
+  /* Shape: Circle */
+  .postit.shape-circle {
+    width: 200px;
+    height: 200px;
+  }
+
+  .postit.shape-circle .postit-inner {
+    border-radius: 50%;
+    clip-path: circle(50%);
+    padding: 45px 30px;
+    text-align: center;
+  }
+
+  /* Shape: Cloud */
+  .postit.shape-cloud {
+    width: 260px;
+    height: 180px;
+  }
+
+  .postit.shape-cloud .postit-inner {
+    border-radius: 100px;
+    padding: 40px 30px;
+    text-align: center;
+  }
+
+  /* Midnight theme colors */
+  .color-deep-blue .postit-inner { background: linear-gradient(135deg, #1a3260, #1e3a6e); color: #c4d4f0; }
+  .color-purple .postit-inner { background: linear-gradient(135deg, #2d2660, #3d2b7b); color: #d4c4f0; }
+  .color-dark-teal .postit-inner { background: linear-gradient(135deg, #1a4040, #1a5050); color: #b0e0e0; }
+  .color-midnight .postit-inner { background: linear-gradient(135deg, #141830, #1a2040); color: #a0b0d0; }
+  .color-gold .postit-inner { background: linear-gradient(135deg, #4a3a1a, #5a4a2a); color: #f0d89e; }
+
+  /* Glitter overlay */
+  .glitter {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+  }
+
+  .glitter-particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    animation: sparkle var(--dur) ease-in-out infinite;
+    opacity: 0;
+  }
+
+  @keyframes sparkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 0.9; transform: scale(1.2); }
+  }
+
+  /* Post-it content */
+  .postit-title {
+    font-family: var(--font);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    opacity: 0.9;
+  }
+
+  .postit-text {
+    font-family: var(--font-handwritten);
+    font-size: 1.15rem;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .postit-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.65rem;
+    opacity: 0.5;
+  }
+
+  /* Pin decorations */
+  .pin {
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--star-gold);
+    box-shadow: 0 0 8px var(--star-glow);
+    z-index: 2;
+  }
+
+  /* Always on top indicator */
+  .pin-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.3);
+    color: var(--star-gold);
+    z-index: 3;
+  }
+
+  /* ===== TOOLBAR (bottom of board) ===== */
+  .toolbar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    z-index: 100;
+    margin-left: 140px;
+  }
+
+  .toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .toolbar-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+    margin: 0 6px;
+  }
+
+  .toolbar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: all 0.15s;
+  }
+
+  .toolbar-btn:hover {
+    background: var(--midnight-blue);
+    border-color: var(--accent);
+  }
+
+  .toolbar-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+
+  .color-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .color-btn:hover, .color-btn.active {
+    border-color: white;
+    transform: scale(1.2);
+  }
+
+  .color-btn.c1 { background: linear-gradient(135deg, #1a3260, #1e3a6e); }
+  .color-btn.c2 { background: linear-gradient(135deg, #2d2660, #3d2b7b); }
+  .color-btn.c3 { background: linear-gradient(135deg, #1a4040, #1a5050); }
+  .color-btn.c4 { background: linear-gradient(135deg, #141830, #1a2040); }
+  .color-btn.c5 { background: linear-gradient(135deg, #4a3a1a, #5a4a2a); }
+
+  .glitter-toggle {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--star-gold);
+    font-family: var(--font);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .glitter-toggle:hover, .glitter-toggle.active {
+    background: rgba(240, 199, 94, 0.15);
+    border-color: var(--star-gold);
+  }
+
+  /* ===== WIREFRAME BADGE ===== */
+  .wireframe-badge {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    background: var(--star-gold);
+    color: #0a101f;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-family: var(--font);
+    font-size: 0.7rem;
+    font-weight: 700;
+    z-index: 300;
+    box-shadow: 0 4px 16px var(--star-glow);
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .toolbar { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- STARFIELD -->
+<div class="starfield" id="starfield"></div>
+<div class="moon"></div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🌙</span>
+        <span class="logo-text">Swift<span>Notes</span></span>
+      </div>
+      <button class="new-note-btn">✨ New Note</button>
+    </div>
+
+    <div class="notes-list">
+      <div class="note-list-item active">
+        <div class="note-preview-title">
+          <span class="note-shape-icon">💙</span>
+          Grocery List
+        </div>
+        <div class="note-preview-text">Milk, eggs, bread, avocados...</div>
+      </div>
+
+      <div class="note-list-item">
+        <div class="note-preview-title">
+          <span class="note-shape-icon">⭐</span>
+          Song Ideas
+        </div>
+        <div class="note-preview-text">Melody for verse 2, bridge lyrics...</div>
+      </div>
+
+      <div class="note-list-item">
+        <div class="note-preview-title">
+          <span class="note-shape-icon">💜</span>
+          Monday Tasks
+        </div>
+        <div class="note-preview-text">Email prof, submit assignment...</div>
+      </div>
+
+      <div class="note-list-item">
+        <div class="note-preview-title">
+          <span class="note-shape-icon">🤍</span>
+          Wishlist
+        </div>
+        <div class="note-preview-text">TS Eras Tour merch, vinyl...</div>
+      </div>
+
+      <div class="note-list-item">
+        <div class="note-preview-title">
+          <span class="note-shape-icon">💛</span>
+          Quotes
+        </div>
+        <div class="note-preview-text">We never go out of style...</div>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="theme-selector">
+        <span class="theme-selector-label">Era</span>
+        <div class="theme-dot midnights active" title="Midnights"></div>
+        <div class="theme-dot lover" title="Lover"></div>
+        <div class="theme-dot folklore" title="Folklore"></div>
+        <div class="theme-dot reputation" title="Reputation"></div>
+        <div class="theme-dot ts1989" title="1989"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- BOARD -->
+  <div class="board">
+
+    <!-- Post-it 1: Square, deep blue -->
+    <div class="postit shape-square color-deep-blue" style="top: 60px; left: 80px; transform: rotate(-2deg);">
+      <div class="pin"></div>
+      <div class="postit-inner">
+        <div class="glitter" id="glitter1"></div>
+        <div class="postit-title">📝 Grocery List</div>
+        <div class="postit-text">
+          Milk, eggs, bread<br>
+          Avocados 🥑<br>
+          Lavender tea<br>
+          Cat food
+        </div>
+        <div class="postit-footer">
+          <span>2 min ago</span>
+          <span>📌</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post-it 2: Star, gold -->
+    <div class="postit shape-star color-gold" style="top: 40px; left: 380px; transform: rotate(3deg);">
+      <div class="postit-inner">
+        <div class="glitter" id="glitter2"></div>
+        <div class="postit-text" style="font-size: 1rem;">
+          Song<br>Ideas ✨
+        </div>
+      </div>
+    </div>
+
+    <!-- Post-it 3: Heart, purple -->
+    <div class="postit shape-heart color-purple" style="top: 300px; left: 120px; transform: rotate(1deg);">
+      <div class="postit-inner">
+        <div class="glitter" id="glitter3"></div>
+        <div class="postit-text" style="font-size: 1.1rem; padding-top: 10px;">
+          it's me,<br>hi 🌙
+        </div>
+      </div>
+    </div>
+
+    <!-- Post-it 4: Rounded, dark teal -->
+    <div class="postit shape-rounded color-dark-teal" style="top: 280px; left: 420px; transform: rotate(-1deg);">
+      <div class="pin"></div>
+      <div class="pin-badge">📌 on top</div>
+      <div class="postit-inner">
+        <div class="glitter" id="glitter4"></div>
+        <div class="postit-title">✅ Monday Tasks</div>
+        <div class="postit-text">
+          Email prof<br>
+          Submit assignment<br>
+          Call dentist<br>
+          Workout 💪
+        </div>
+        <div class="postit-footer">
+          <span>1 hour ago</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post-it 5: Circle, midnight -->
+    <div class="postit shape-circle color-midnight" style="top: 100px; left: 660px; transform: rotate(2deg);">
+      <div class="postit-inner">
+        <div class="glitter" id="glitter5"></div>
+        <div class="postit-text" style="font-size: 1rem;">
+          Dream<br>big 🌟
+        </div>
+      </div>
+    </div>
+
+    <!-- Post-it 6: Cloud, deep blue -->
+    <div class="postit shape-cloud color-deep-blue" style="top: 320px; left: 700px; transform: rotate(-2deg);">
+      <div class="postit-inner">
+        <div class="glitter" id="glitter6"></div>
+        <div class="postit-text" style="font-size: 1rem;">
+          Wishlist: Eras Tour<br>
+          vinyl, merch ✨
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="toolbar-section">
+    <div class="toolbar-btn active" title="Square">▪️</div>
+    <div class="toolbar-btn" title="Rounded">⬜</div>
+    <div class="toolbar-btn" title="Heart">💜</div>
+    <div class="toolbar-btn" title="Star">⭐</div>
+    <div class="toolbar-btn" title="Circle">⚪</div>
+    <div class="toolbar-btn" title="Cloud">☁️</div>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-section">
+    <div class="color-btn c1 active"></div>
+    <div class="color-btn c2"></div>
+    <div class="color-btn c3"></div>
+    <div class="color-btn c4"></div>
+    <div class="color-btn c5"></div>
+  </div>
+
+  <div class="toolbar-divider"></div>
+
+  <button class="glitter-toggle active">✨ Glitter</button>
+
+  <div class="toolbar-divider"></div>
+
+  <div class="toolbar-btn" title="Pin to desktop">📌</div>
+  <div class="toolbar-btn" title="Always on top">⬆️</div>
+  <div class="toolbar-btn" title="Font">Aa</div>
+</div>
+
+<!-- WIREFRAME BADGE -->
+<div class="wireframe-badge">📐 WIREFRAME — SwiftNotes</div>
+
+<script>
+  // Generate stars
+  const starfield = document.getElementById('starfield');
+  for (let i = 0; i < 100; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+    star.style.animationDelay = -Math.random() * 5 + 's';
+    star.style.width = star.style.height = (1 + Math.random() * 2) + 'px';
+    starfield.appendChild(star);
+  }
+
+  // Generate glitter particles
+  function addGlitter(containerId, count) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const colors = ['#a8c0f0', '#d4a8f0', '#f0d4a8', '#f0c75e', '#ffffff'];
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('div');
+      p.className = 'glitter-particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.background = colors[Math.floor(Math.random() * colors.length)];
+      p.style.setProperty('--dur', (1 + Math.random() * 3) + 's');
+      p.style.animationDelay = -Math.random() * 3 + 's';
+      p.style.width = p.style.height = (1.5 + Math.random() * 2.5) + 'px';
+      container.appendChild(p);
+    }
+  }
+
+  addGlitter('glitter1', 25);
+  addGlitter('glitter2', 30);
+  addGlitter('glitter3', 20);
+  addGlitter('glitter4', 25);
+  addGlitter('glitter5', 20);
+  addGlitter('glitter6', 22);
+</script>
+
+</body>
+</html>

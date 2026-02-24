@@ -1,0 +1,33 @@
+/* ===== Glitter / Sparkle Effects ===== */
+
+.glitter-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: inherit;
+    z-index: 1;
+}
+
+.glitter-particle {
+    position: absolute;
+    border-radius: 50%;
+    animation: sparkle var(--dur) ease-in-out infinite;
+    animation-delay: var(--delay);
+    opacity: 0;
+    will-change: opacity, transform;
+}
+
+@keyframes sparkle {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: scale(1.2);
+    }
+}

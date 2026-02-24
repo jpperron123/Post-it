@@ -1,0 +1,65 @@
+/* ===== 🌙 Midnights Theme ===== */
+
+:root {
+    --bg: #0f1729;
+    --bg-deeper: #0a101f;
+    --surface: #1a2540;
+    --surface-hover: #213058;
+    --border: #2a3a5c;
+    --text: #e8ecf4;
+    --text-muted: #7b8ab0;
+    --accent: #7c9cdb;
+    --star-gold: #f0c75e;
+    --star-glow: rgba(240, 199, 94, 0.3);
+    --moonlight: #c4d4f0;
+    --glitter1: #a8c0f0;
+    --glitter2: #d4a8f0;
+    --glitter3: #f0d4a8;
+}
+
+/* Note Colors */
+.color-deep-blue .postit-inner {
+    background: linear-gradient(135deg, #1a3260, #1e3a6e);
+    color: #c4d4f0;
+}
+
+.color-purple .postit-inner {
+    background: linear-gradient(135deg, #2d2660, #3d2b7b);
+    color: #d4c4f0;
+}
+
+.color-dark-teal .postit-inner {
+    background: linear-gradient(135deg, #1a4040, #1a5050);
+    color: #b0e0e0;
+}
+
+.color-midnight .postit-inner {
+    background: linear-gradient(135deg, #141830, #1a2040);
+    color: #a0b0d0;
+}
+
+.color-gold .postit-inner {
+    background: linear-gradient(135deg, #4a3a1a, #5a4a2a);
+    color: #f0d89e;
+}
+
+/* Toolbar color buttons */
+.color-btn[data-color="deep-blue"] {
+    background: linear-gradient(135deg, #1a3260, #1e3a6e);
+}
+
+.color-btn[data-color="purple"] {
+    background: linear-gradient(135deg, #2d2660, #3d2b7b);
+}
+
+.color-btn[data-color="dark-teal"] {
+    background: linear-gradient(135deg, #1a4040, #1a5050);
+}
+
+.color-btn[data-color="midnight"] {
+    background: linear-gradient(135deg, #141830, #1a2040);
+}
+
+.color-btn[data-color="gold"] {
+    background: linear-gradient(135deg, #4a3a1a, #5a4a2a);
+}
