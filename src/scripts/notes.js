@@ -28,7 +28,10 @@ let selectedNoteId = null;
 let onSelectionChange = null;
 
 /**
- * Auto-resize a note's shape based on its content
+ * Auto-resize a note's shape based on its content.
+ * Uses scrollHeight vs clientHeight (works with overflow: hidden).
+ * For proportional shapes (heart, star, circle), grows both dimensions.
+ * For rectangular shapes (square, rounded, cloud), grows height only.
  */
 function autoResizeNote(noteEl) {
     const content = noteEl.querySelector('.postit-content');
@@ -37,52 +40,56 @@ function autoResizeNote(noteEl) {
     const shape = noteEl.className.match(/shape-(\w+)/)?.[1] || 'square';
     const base = BASE_SIZES[shape] || BASE_SIZES.square;
 
-    // Measure how much space the content needs
-    const contentH = content.scrollHeight;
-    const contentW = content.scrollWidth;
-    const currentH = noteEl.offsetHeight;
+    // Square/rounded grow naturally via CSS, no JS needed
+    if (shape === 'square' || shape === 'rounded') return;
+
+    const scrollH = content.scrollHeight;
+    const clientH = content.clientHeight;
+
+    if (clientH <= 0) return; // not rendered yet
+
     const currentW = noteEl.offsetWidth;
+    const currentH = noteEl.offsetHeight;
 
-    // For proportional shapes, check if content overflows the inner area
-    const inner = noteEl.querySelector('.postit-inner');
-    if (!inner) return;
-
-    // Calculate needed growth
-    const contentArea = content.getBoundingClientRect();
-    const overflow = contentH - contentArea.height;
-
-    if (overflow > 5) {
-        // Content overflows — grow the shape
-        const growPixels = overflow + 20; // extra breathing room
+    if (scrollH > clientH + 2) {
+        // Content overflows → grow the shape
+        // Grow factor with 20% buffer to avoid needing multiple resizes
+        const growFactor = (scrollH / clientH) * 1.2;
 
         if (base.proportional) {
-            // Maintain aspect ratio
             const ratio = base.w / base.h;
-            const newH = currentH + growPixels;
+            const newH = Math.round(currentH * growFactor);
             const newW = Math.round(newH * ratio);
             noteEl.style.width = newW + 'px';
             noteEl.style.height = newH + 'px';
         } else {
-            // Just grow height
-            noteEl.style.height = (currentH + growPixels) + 'px';
+            noteEl.style.height = Math.round(currentH * growFactor) + 'px';
         }
-    } else if (overflow < -30 && currentH > base.h) {
-        // Content shrank — shrink back (but not below base size)
-        const shrinkPixels = Math.min(-overflow - 20, currentH - base.h);
-        if (shrinkPixels > 10) {
-            if (base.proportional) {
-                const ratio = base.w / base.h;
-                const newH = Math.max(base.h, currentH - shrinkPixels);
-                const newW = Math.round(newH * ratio);
-                noteEl.style.width = newW + 'px';
-                noteEl.style.height = newH + 'px';
-            } else {
-                noteEl.style.height = Math.max(base.h, currentH - shrinkPixels) + 'px';
-            }
-        }
-    }
 
-    // Update data model
+        // Save to data model
+        saveNoteSize(noteEl);
+    } else if (scrollH < clientH * 0.5 && currentH > base.h * 1.15) {
+        // Content is much smaller than available → shrink back
+        const shrinkFactor = Math.max(scrollH / clientH * 1.3, base.h / currentH);
+
+        if (base.proportional) {
+            const ratio = base.w / base.h;
+            const newH = Math.max(base.h, Math.round(currentH * shrinkFactor));
+            const newW = Math.max(base.w, Math.round(newH * ratio));
+            noteEl.style.width = newW + 'px';
+            noteEl.style.height = newH + 'px';
+        } else {
+            noteEl.style.height = Math.max(base.h, Math.round(currentH * shrinkFactor)) + 'px';
+        }
+
+        saveNoteSize(noteEl);
+    }
+}
+
+/**
+ * Save the current note element size to the data model
+ */
+function saveNoteSize(noteEl) {
     const noteId = noteEl.dataset.id;
     const notes = getNotes();
     const note = notes.find(n => n.id === noteId);

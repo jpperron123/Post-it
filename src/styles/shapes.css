@@ -1,15 +1,26 @@
 /* ===== Post-it Shapes ===== */
 
-/* Content wrapper */
+/*
+ * Strategy for clip-path shapes (heart, star, circle, cloud):
+ * - .postit-content is absolutely positioned in the center of the shape
+ *   with explicit pixel insets → text CANNOT escape this rectangle
+ * - overflow: hidden on .postit-content → enables scrollHeight detection for auto-resize
+ * - When auto-resize detects overflow, it grows the shape →
+ *   the content area grows proportionally (percentage insets)
+ * - Clip-paths use % units so they scale with the element
+ */
+
+/* Content wrapper base: fills parent by default (for square/rounded) */
 .postit-content {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    overflow: visible;
 }
 
-/* ========== Shape: Square ========== */
+/* ========================================
+   Square — simple, grows vertically
+   ======================================== */
 .postit.shape-square {
     min-width: 220px;
     min-height: 220px;
@@ -19,7 +30,9 @@
     border-radius: 4px;
 }
 
-/* ========== Shape: Rounded ========== */
+/* ========================================
+   Rounded — simple, grows vertically
+   ======================================== */
 .postit.shape-rounded {
     min-width: 220px;
     min-height: 200px;
@@ -30,10 +43,11 @@
     padding: 22px;
 }
 
-/* ========== Shape: Heart (polygon % — scales with element) ========== */
+/* ========================================
+   Heart — polygon %, auto-resizable
+   Text box: absolutely centered rectangle
+   ======================================== */
 .postit.shape-heart {
-    min-width: 260px;
-    min-height: 240px;
     width: 260px;
     height: 240px;
 }
@@ -44,18 +58,21 @@
             2% 14%, 8% 6%, 17% 1%, 28% 0%, 38% 2%, 50% 16%,
             62% 2%, 72% 0%, 83% 1%, 92% 6%, 98% 14%,
             100% 24%, 99% 36%, 94% 50%, 82% 66%, 50% 92%);
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .postit.shape-heart .postit-content {
+    position: absolute;
+    top: 28%;
+    left: 23%;
+    right: 23%;
+    bottom: 30%;
+    flex: unset;
+    overflow: hidden;
     text-align: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    max-width: 55%;
 }
 
 .postit.shape-heart .postit-title {
@@ -66,34 +83,39 @@
 .postit.shape-heart .postit-text {
     font-size: 0.88rem;
     line-height: 1.25;
+    flex: unset;
 }
 
 .postit.shape-heart .postit-footer {
     display: none;
 }
 
-/* ========== Shape: Star (polygon % — scales with element) ========== */
+/* ========================================
+   Star — polygon %, auto-resizable
+   Text box: tight rectangle in the center
+   ======================================== */
 .postit.shape-star {
-    min-width: 280px;
-    min-height: 270px;
     width: 280px;
     height: 270px;
 }
 
 .postit.shape-star .postit-inner {
     clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .postit.shape-star .postit-content {
+    position: absolute;
+    top: 38%;
+    left: 35%;
+    right: 35%;
+    bottom: 40%;
+    flex: unset;
+    overflow: hidden;
     text-align: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 5px;
-    max-width: 42%;
 }
 
 .postit.shape-star .postit-title {
@@ -104,16 +126,17 @@
 .postit.shape-star .postit-text {
     font-size: 0.82rem;
     line-height: 1.2;
+    flex: unset;
 }
 
 .postit.shape-star .postit-footer {
     display: none;
 }
 
-/* ========== Shape: Circle (ellipse % — scales with element) ========== */
+/* ========================================
+   Circle — ellipse %, auto-resizable
+   ======================================== */
 .postit.shape-circle {
-    min-width: 220px;
-    min-height: 220px;
     width: 220px;
     height: 220px;
 }
@@ -121,18 +144,21 @@
 .postit.shape-circle .postit-inner {
     border-radius: 50%;
     clip-path: ellipse(50% 50%);
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .postit.shape-circle .postit-content {
+    position: absolute;
+    top: 22%;
+    left: 18%;
+    right: 18%;
+    bottom: 22%;
+    flex: unset;
+    overflow: hidden;
     text-align: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 10px;
-    max-width: 65%;
 }
 
 .postit.shape-circle .postit-title {
@@ -143,33 +169,38 @@
 .postit.shape-circle .postit-text {
     font-size: 0.95rem;
     line-height: 1.25;
+    flex: unset;
 }
 
 .postit.shape-circle .postit-footer {
     display: none;
 }
 
-/* ========== Shape: Cloud ========== */
+/* ========================================
+   Cloud — border-radius, auto-resizable
+   ======================================== */
 .postit.shape-cloud {
-    min-width: 270px;
-    min-height: 190px;
     width: 270px;
     height: 190px;
 }
 
 .postit.shape-cloud .postit-inner {
     border-radius: 100px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .postit.shape-cloud .postit-content {
+    position: absolute;
+    top: 20%;
+    left: 18%;
+    right: 18%;
+    bottom: 20%;
+    flex: unset;
+    overflow: hidden;
     text-align: center;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 10px;
-    max-width: 65%;
+    justify-content: center;
 }
 
 .postit.shape-cloud .postit-title {
@@ -180,13 +211,16 @@
 .postit.shape-cloud .postit-text {
     font-size: 0.95rem;
     line-height: 1.3;
+    flex: unset;
 }
 
 .postit.shape-cloud .postit-footer {
     display: none;
 }
 
-/* Transition for smooth resizing */
+/* ========================================
+   Smooth resize animation
+   ======================================== */
 .postit {
-    transition: width 0.25s ease, height 0.25s ease, filter 0.3s ease;
+    transition: width 0.3s ease, height 0.3s ease, filter 0.3s ease;
 }

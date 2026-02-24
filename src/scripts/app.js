@@ -10,9 +10,9 @@ import { initToolbar, updateToolbarState } from './toolbar.js';
 /**
  * Initialize the app
  */
-function init() {
-    // Load saved data
-    loadData();
+async function init() {
+    // Load saved data (async in Tauri, sync in web)
+    await loadData();
 
     // Initialize theme
     initTheme();
