@@ -5,6 +5,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-windows:
     runs-on: windows-latest
@@ -34,9 +37,15 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload MSI installer
+        uses: actions/upload-artifact@v4
         with:
-          tagName: v__VERSION__
-          releaseName: 'SwiftNotes v__VERSION__'
-          releaseBody: 'Installer Windows pour SwiftNotes'
-          releaseDraft: false
-          prerelease: false
+          name: SwiftNotes-msi-installer
+          path: src-tauri/target/release/bundle/msi/*.msi
+
+      - name: Upload EXE installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: SwiftNotes-exe-installer
+          path: src-tauri/target/release/bundle/nsis/*-setup.exe
