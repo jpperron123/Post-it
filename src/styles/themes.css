@@ -25,13 +25,13 @@
 
 /* ===== 💗 Lover ===== */
 [data-theme="lover"] {
-    --bg: #f8e8f0;
-    --bg-deeper: #f0d8e8;
-    --surface: #fceef5;
-    --surface-hover: #f8dce8;
-    --border: #e8c0d8;
-    --text: #4a2040;
-    --text-muted: #9a7088;
+    --bg: #fff5f9;
+    --bg-deeper: #fff0f5;
+    --surface: #ffffff;
+    --surface-hover: #fff0f5;
+    --border: #f5c0d8;
+    --text: #4a1030;
+    --text-muted: #b06080;
     --accent: #e060a0;
     --star-gold: #f0c75e;
     --star-glow: rgba(240, 199, 94, 0.3);

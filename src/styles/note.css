@@ -345,56 +345,56 @@ body {
     }
 }
 
-/* ===== NOTE COLORS (Midnights) ===== */
+/* ===== NOTE COLORS (Midnights) — High contrast text ===== */
 .note-color-0 .note-body {
     background: linear-gradient(135deg, #1a3260, #1e3a6e);
-    color: #c4d4f0;
+    color: #e0ecff;
 }
 
 .note-color-1 .note-body {
     background: linear-gradient(135deg, #2d2660, #3d2b7b);
-    color: #d4c4f0;
+    color: #e8deff;
 }
 
 .note-color-2 .note-body {
     background: linear-gradient(135deg, #1a4040, #1a5050);
-    color: #b0e0e0;
+    color: #d0ffff;
 }
 
 .note-color-3 .note-body {
     background: linear-gradient(135deg, #141830, #1a2040);
-    color: #a0b0d0;
+    color: #c8d8f8;
 }
 
 .note-color-4 .note-body {
     background: linear-gradient(135deg, #4a3a1a, #5a4a2a);
-    color: #f0d89e;
+    color: #ffe8a8;
 }
 
-/* ===== NOTE COLORS (Lover) ===== */
+/* ===== NOTE COLORS (Lover) — High contrast text ===== */
 [data-theme="lover"] .note-color-0 .note-body {
     background: linear-gradient(135deg, #e080a8, #e060a0);
-    color: #fff0f5;
+    color: #ffffff;
 }
 
 [data-theme="lover"] .note-color-1 .note-body {
     background: linear-gradient(135deg, #c090e0, #b070d0);
-    color: #f5f0ff;
+    color: #ffffff;
 }
 
 [data-theme="lover"] .note-color-2 .note-body {
     background: linear-gradient(135deg, #80c0c0, #60b0b0);
-    color: #f0ffff;
+    color: #ffffff;
 }
 
 [data-theme="lover"] .note-color-3 .note-body {
     background: linear-gradient(135deg, #f0b0c0, #e898b0);
-    color: #fff0f0;
+    color: #4a0020;
 }
 
 [data-theme="lover"] .note-color-4 .note-body {
     background: linear-gradient(135deg, #e0c070, #d0a858);
-    color: #fff8e8;
+    color: #3a2800;
 }
 
 /* Glitter particle colors */

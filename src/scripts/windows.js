@@ -55,7 +55,7 @@ export async function openNoteWindow(noteId) {
         transparent: true,
         decorations: false,
         shadow: false,
-        resizable: false,
+        resizable: true,
         alwaysOnTop: note.pinned || false,
         skipTaskbar: false,
         center: (x === undefined),

@@ -23,6 +23,20 @@ const COLOR_GRADIENTS = {
     ],
 };
 
+const TEXT_COLORS = {
+    midnights: ['#e0ecff', '#e8deff', '#d0ffff', '#c8d8f8', '#ffe8a8'],
+    lover: ['#ffffff', '#ffffff', '#ffffff', '#4a0020', '#3a2800'],
+};
+
+/**
+ * Get the text color for the current theme and color index
+ */
+function getTextColorForIndex(index) {
+    const theme = getTheme();
+    const colors = TEXT_COLORS[theme] || TEXT_COLORS.midnights;
+    return colors[index] || '#ffffff';
+}
+
 /** Creation toolbar state */
 let selectedShape = 'square';
 let selectedColor = 0;
@@ -147,18 +161,22 @@ function renderNotesList() {
     }
     empty.style.display = 'none';
 
-    const colors = COLOR_GRADIENTS[getTheme()] || COLOR_GRADIENTS.midnights;
+    const defaultColors = COLOR_GRADIENTS[getTheme()] || COLOR_GRADIENTS.midnights;
 
     for (const note of notes) {
         const item = document.createElement('div');
         item.className = 'note-item';
         item.dataset.id = note.id;
 
-        // Color swatch
+        // Color swatch — use saved gradient if available, otherwise fall back to theme
         const colorDiv = document.createElement('div');
         colorDiv.className = 'note-item-color';
         const ci = note.colorIndex ?? 0;
-        colorDiv.style.background = `linear-gradient(135deg, ${colors[ci][0]}, ${colors[ci][1]})`;
+        if (note.colorGradient) {
+            colorDiv.style.background = note.colorGradient;
+        } else {
+            colorDiv.style.background = `linear-gradient(135deg, ${defaultColors[ci][0]}, ${defaultColors[ci][1]})`;
+        }
         colorDiv.textContent = SHAPE_ICONS[note.shape || 'square'] || '📝';
 
         // Info
@@ -226,12 +244,18 @@ function setupButtons() {
     // New Note — uses selected shape/color/glitter from toolbar
     document.getElementById('btn-new-note').addEventListener('click', async () => {
         const notes = getNotes();
+        // Save the actual color values so they persist across theme changes
+        const colors = COLOR_GRADIENTS[getTheme()] || COLOR_GRADIENTS.midnights;
+        const colorPair = colors[selectedColor];
         const newNote = {
             id: generateId(),
             title: '',
             text: '',
             shape: selectedShape,
             colorIndex: selectedColor,
+            // Store actual colors so they don't change with theme
+            colorGradient: `linear-gradient(135deg, ${colorPair[0]}, ${colorPair[1]})`,
+            colorText: getTextColorForIndex(selectedColor),
             font: 'Caveat',
             glitter: selectedGlitter,
             pinned: false,

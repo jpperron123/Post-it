@@ -12,6 +12,12 @@ const FONT_MAP = {
 
 const MAX_CHARS = 1000;
 
+/** Font size range */
+const MIN_FONT_SIZE = 0.7;
+const MAX_FONT_SIZE = 3.0;
+const FONT_STEP = 0.15;
+let currentFontScale = 1.0;
+
 /** Base sizes per shape (also used as minimum) */
 const BASE_SIZES = {
     square: { w: 260, h: 260 },
@@ -67,11 +73,15 @@ async function init() {
         tauriWin = mod.getCurrentWindow();
     } catch (e) { /* browser */ }
 
+    // Restore font scale
+    currentFontScale = noteData.fontScale || 1.0;
+
     applyTheme();
     renderNote();
     setupEditing();
     setupDrag();
     setupPin();
+    setupFontZoom();
     trackWindowGeometry();
 
     setInterval(checkForUpdates, 1500);
@@ -135,7 +145,15 @@ function renderNote() {
     // Set classes
     win.className = 'note-window';
     win.classList.add(`shape-${shape}`);
-    win.classList.add(`note-color-${colorIdx}`);
+
+    // Use saved colors if available (persist across theme changes), otherwise use CSS class
+    const noteBody = document.getElementById('note-body');
+    if (noteData.colorGradient) {
+        noteBody.style.background = noteData.colorGradient;
+        noteBody.style.color = noteData.colorText || '#ffffff';
+    } else {
+        win.classList.add(`note-color-${colorIdx}`);
+    }
 
     // Pin state
     pinEl.classList.toggle('pinned', !!noteData.pinned);
@@ -163,7 +181,6 @@ function renderNote() {
     }
 
     // Content area for clip-path shapes
-    const noteBody = document.getElementById('note-body');
     if (['heart', 'star', 'circle', 'cloud'].includes(shape)) {
         let contentArea = noteBody.querySelector('.note-content-area');
         if (!contentArea) {
@@ -189,6 +206,9 @@ function renderNote() {
     } else {
         gc.innerHTML = '';
     }
+
+    // Apply font scale
+    applyFontScale();
 
     // Set initial size on first render, then auto-resize based on content
     autoResize();
@@ -366,9 +386,68 @@ function debouncedSave() {
             freshNote.text = noteData.text;
             if (noteData.position) freshNote.position = noteData.position;
             freshNote.pinned = noteData.pinned;
+            if (noteData.fontScale) freshNote.fontScale = noteData.fontScale;
         }
         saveData();
     }, 500);
+}
+
+/**
+ * Apply font scale to note text elements
+ */
+function applyFontScale() {
+    const titleEl = document.querySelector('.note-title');
+    const textEl = document.querySelector('.note-text');
+    if (titleEl) titleEl.style.fontSize = (0.85 * currentFontScale) + 'rem';
+    if (textEl) textEl.style.fontSize = (1.15 * currentFontScale) + 'rem';
+}
+
+/**
+ * Setup keyboard shortcuts for font size (Ctrl+Plus / Ctrl+Minus / Ctrl+0)
+ */
+function setupFontZoom() {
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            if (e.key === '=' || e.key === '+') {
+                e.preventDefault();
+                currentFontScale = Math.min(MAX_FONT_SIZE, currentFontScale + FONT_STEP);
+                applyFontScale();
+                saveFontScale();
+            } else if (e.key === '-') {
+                e.preventDefault();
+                currentFontScale = Math.max(MIN_FONT_SIZE, currentFontScale - FONT_STEP);
+                applyFontScale();
+                saveFontScale();
+            } else if (e.key === '0') {
+                e.preventDefault();
+                currentFontScale = 1.0;
+                applyFontScale();
+                saveFontScale();
+            }
+        }
+    });
+
+    // Also support Ctrl+scroll wheel for zoom
+    document.addEventListener('wheel', (e) => {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                currentFontScale = Math.min(MAX_FONT_SIZE, currentFontScale + FONT_STEP);
+            } else {
+                currentFontScale = Math.max(MIN_FONT_SIZE, currentFontScale - FONT_STEP);
+            }
+            applyFontScale();
+            saveFontScale();
+        }
+    }, { passive: false });
+}
+
+/**
+ * Save font scale to note data
+ */
+function saveFontScale() {
+    noteData.fontScale = currentFontScale;
+    debouncedSave();
 }
 
 init().catch(e => console.error('[Note] Init failed:', e));

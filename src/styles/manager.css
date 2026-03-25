@@ -67,7 +67,7 @@ body {
 .manager-header {
     padding: 20px 16px 12px;
     border-bottom: 1px solid var(--border);
-    background: rgba(10, 16, 31, 0.6);
+    background: var(--bg-deeper);
     backdrop-filter: blur(12px);
 }
 
@@ -108,7 +108,7 @@ body {
 .creation-toolbar {
     padding: 12px 16px;
     border-bottom: 1px solid var(--border);
-    background: rgba(10, 16, 31, 0.5);
+    background: var(--bg-deeper);
     backdrop-filter: blur(12px);
 }
 
@@ -349,7 +349,7 @@ body {
 .manager-footer {
     padding: 12px 16px;
     border-top: 1px solid var(--border);
-    background: rgba(10, 16, 31, 0.6);
+    background: var(--bg-deeper);
     backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
@@ -361,6 +361,12 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     color: var(--text-muted);
+}
+
+/* Lover theme: "Thème" label matches the gold color like "Swift" in logo */
+[data-theme="lover"] .theme-label {
+    color: var(--star-gold);
+    font-weight: 700;
 }
 
 .theme-selector {
